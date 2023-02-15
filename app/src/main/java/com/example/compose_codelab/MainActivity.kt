@@ -44,175 +44,166 @@ class MainActivity : ComponentActivity() {
                 ) {
                     LayoutsCodelab()
 
-//                    MyColumn(modifier = Modifier.padding(15.dp))
-//                    PhotographerCard(modifier = Modifier.fillMaxWidth(1f)) {
-//                        Column() {
-//                            Text(text = "하하하")
-//                            Text(text = "하하하")
-//                            Text(text = "하하하")
-//                            Text(text = "하하하")
-//                        }
-//                    }
                 }
             }
         }
     }
 
-    @Composable
-    fun ContentView() {
-        var shouldShowOnboarding by rememberSaveable { mutableStateOf(true) }
+@Composable
+fun ContentView() {
+    var shouldShowOnboarding by rememberSaveable { mutableStateOf(true) }
 
-        if (shouldShowOnboarding) {
-            OnboardingScreen(onContinueClicked = {
-                Log.d("TAG", "ContentView: 온보딩 클릭됨")
-                shouldShowOnboarding = !shouldShowOnboarding
-            })
-        } else {
+    if (shouldShowOnboarding) {
+        OnboardingScreen(onContinueClicked = {
+            Log.d("TAG", "ContentView: 온보딩 클릭됨")
+            shouldShowOnboarding = !shouldShowOnboarding
+        })
+    } else {
 //        MyColumn(modifier = Modifier.padding(20.dp))
-            MyLazyColumn(modifier = Modifier.padding(20.dp))
+        MyLazyColumn(modifier = Modifier.padding(20.dp))
 
-        }
+    }
 
 
 //    Surface(color = Blue200) {
 //        MyCoiumn()
 //    }
-    }
+}
 
-    @Composable
-    fun MyColumn(
-        modifier: Modifier = Modifier,
-        fruits: List<String> = listOf("Banana", "Apple", "Strawberry")
-    ) {
-        Column(modifier) {
-            for (name in fruits) {
-                FruitView(name = name)
-            }
+@Composable
+fun MyColumn(
+    modifier: Modifier = Modifier,
+    fruits: List<String> = listOf("Banana", "Apple", "Strawberry")
+) {
+    Column(modifier) {
+        for (name in fruits) {
+            FruitView(name = name)
         }
     }
+}
 
-    @Composable
-    fun MyLazyColumn(fruits: List<String> = List(1000) { "번호 : $it" }, modifier: Modifier) {
-        LazyColumn(modifier = modifier) {
-            items(items = fruits) { name ->
-                FruitView(name = name)
-            }
+@Composable
+fun MyLazyColumn(fruits: List<String> = List(1000) { "번호 : $it" }, modifier: Modifier) {
+    LazyColumn(modifier = modifier) {
+        items(items = fruits) { name ->
+            FruitView(name = name)
         }
     }
+}
 
-    @Composable
-    fun FruitView(name: String) {
+@Composable
+fun FruitView(name: String) {
 
-        val expanded = rememberSaveable { mutableStateOf(false) }
+    val expanded = rememberSaveable { mutableStateOf(false) }
 
-        var isOpen by remember { mutableStateOf(false) }
+    var isOpen by remember { mutableStateOf(false) }
 
-        val (shouldOpen, setShouldOpen) = remember { mutableStateOf(false) }
+    val (shouldOpen, setShouldOpen) = remember { mutableStateOf(false) }
 
 //    val extraPadding = if (expanded.value) 48.dp else 0.dp
 
-        val extraPadding by animateDpAsState(
-            if (expanded.value) 48.dp else 0.dp,
+    val extraPadding by animateDpAsState(
+        if (expanded.value) 48.dp else 0.dp,
 //        animationSpec = spring(
 //            dampingRatio = Spring.DampingRatioMediumBouncy,
 //            stiffness = Spring.StiffnessLow
 //        )
-        )
+    )
 
-        Surface(color = Teal200, modifier = Modifier
-            .clickable { Log.d("Tag", " FruitVIEW : $name") }
-            .padding(bottom = extraPadding))
-        {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(10.dp).fillMaxWidth(1.0f)
-            ) {
-                Text(
-                    text = name,
-                    modifier = Modifier
-                        .padding(20.dp)
+    Surface(color = Teal200, modifier = Modifier
+        .clickable { Log.d("Tag", " FruitVIEW : $name") }
+        .padding(bottom = extraPadding))
+    {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(10.dp).fillMaxWidth(1.0f)
+        ) {
+            Text(
+                text = name,
+                modifier = Modifier
+                    .padding(20.dp)
 //                    .fillMaxWidth(1.0f)
-                        .background(Color.Red)
-                        .weight(0.5f),
-                    style = MaterialTheme.typography.h4.copy(
-                        fontWeight = FontWeight.ExtraBold
-                    )
+                    .background(Color.Red)
+                    .weight(0.5f),
+                style = MaterialTheme.typography.h4.copy(
+                    fontWeight = FontWeight.ExtraBold
                 )
-                OutlinedButton(
+            )
+            OutlinedButton(
 //                modifier = Modifier.weight(0.5f),
-                    onClick = {
-                        expanded.value = !expanded.value
+                onClick = {
+                    expanded.value = !expanded.value
 //                    isOpen = !isOpen
 //                    setShouldOpen(!shouldOpen)
 
-                    }) {
-                    Text(text = if (expanded.value) "열렸다" else "닫혔다")
+                }) {
+                Text(text = if (expanded.value) "열렸다" else "닫혔다")
 //                Text(text = if (isOpen) "열렸다" else "닫혔다")
 //                Text(text = if (shouldOpen) "열렸다" else "닫혔다")
 
-                }
-            }
-        }
-
-    }
-
-    @Composable
-    fun OnboardingScreen(onContinueClicked: () -> Unit) {
-        // TODO: This state should be hoisted
-        var shouldShowOnboarding by remember { mutableStateOf(true) }
-
-        Surface {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("Welcome to the Basics Codelab!")
-                Button(
-                    modifier = Modifier.padding(vertical = 24.dp),
-                    onClick = onContinueClicked
-                ) {
-                    Text("Continue")
-                }
             }
         }
     }
 
-    @Composable
-    fun PhotographerCard(
-        modifier: Modifier = Modifier,
-        contentSlot: @Composable () -> Unit
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier
-                .background(Blue200)
-                .padding(all = 10.dp)
-                .height(300.dp)
+}
+
+@Composable
+fun OnboardingScreen(onContinueClicked: () -> Unit) {
+    // TODO: This state should be hoisted
+    var shouldShowOnboarding by remember { mutableStateOf(true) }
+
+    Surface {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Surface(
-                modifier = Modifier
-                    .size(80.dp)
-                    .weight(0.3f)
-                    .clickable { Log.d("TAG", "PhotographerCard: 클릭") }
-                    .clip(RoundedCornerShape(topStart = 10.dp, bottomEnd = 10.dp))
-                    .background(Color.Red)
-                    .padding(10.dp)
-                    .background(Color.Magenta)
-                    .padding(10.dp)
-                    .background(Color.Yellow),
-                shape = CircleShape,
-                color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)) {
+            Text("Welcome to the Basics Codelab!")
+            Button(
+                modifier = Modifier.padding(vertical = 24.dp),
+                onClick = onContinueClicked
+            ) {
+                Text("Continue")
             }
+        }
+    }
+}
 
-            Surface(
-                modifier = Modifier
-                    .background(Color.Yellow)
-                    .weight(0.7f)
-                    .fillMaxHeight(),
-                content = contentSlot
-            )
+@Composable
+fun PhotographerCard(
+    modifier: Modifier = Modifier,
+    contentSlot: @Composable () -> Unit
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .background(Blue200)
+            .padding(all = 10.dp)
+            .height(300.dp)
+    ) {
+        Surface(
+            modifier = Modifier
+                .size(80.dp)
+                .weight(0.3f)
+                .clickable { Log.d("TAG", "PhotographerCard: 클릭") }
+                .clip(RoundedCornerShape(topStart = 10.dp, bottomEnd = 10.dp))
+                .background(Color.Red)
+                .padding(10.dp)
+                .background(Color.Magenta)
+                .padding(10.dp)
+                .background(Color.Yellow),
+            shape = CircleShape,
+            color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f)) {
+        }
+
+        Surface(
+            modifier = Modifier
+                .background(Color.Yellow)
+                .weight(0.7f)
+                .fillMaxHeight(),
+            content = contentSlot
+        )
 
 //        Column(
 //            verticalArrangement = Arrangement.spacedBy(3.dp),
@@ -239,8 +230,8 @@ class MainActivity : ComponentActivity() {
 //                        .weight(2f))
 //            }
 //        }
-        }
     }
+}
 
 @Composable
 fun LayoutsCodelab() {
@@ -405,14 +396,14 @@ fun SomeText(){
     }
 }
 
-    @Composable
-    fun BodyContent(modifier: Modifier = Modifier, contentSlot : @Composable () -> Unit) {
+@Composable
+fun BodyContent(modifier: Modifier = Modifier, contentSlot : @Composable () -> Unit) {
 
-        Surface(
-            color = Blue200,
-            modifier = modifier,
-            content = contentSlot
-        )
+    Surface(
+        color = Blue200,
+        modifier = modifier,
+        content = contentSlot
+    )
 
 //    Surface(
 //        color = Blue200,
@@ -432,28 +423,19 @@ fun SomeText(){
 //            Text(text = "Thanks for going through the Layouts codelab")
 //        }
 //    }
-    }
+}
 
-    @Preview(
-        showBackground = true,
-        widthDp = 320,
-        uiMode = UI_MODE_NIGHT_NO,
-        name = "DefaultPreviewDark"
-    )
-    @Composable
-    fun DefaultPreview() {
-        Compose_CodelabTheme {
+@Preview(
+    showBackground = true,
+    widthDp = 320,
+    uiMode = UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewDark"
+)
+@Composable
+fun DefaultPreview() {
+    Compose_CodelabTheme {
 //        MyColumn()
-            LayoutsCodelab()
-
-        //            PhotographerCard(modifier = Modifier.fillMaxWidth(1f)) {
-//                Column() {
-//                    Text(text = "하하하")
-//                    Text(text = "하하하")
-//                    Text(text = "하하하")
-//                    Text(text = "하하하")
-//                }
-//            }
+        LayoutsCodelab()
         }
     }
 }

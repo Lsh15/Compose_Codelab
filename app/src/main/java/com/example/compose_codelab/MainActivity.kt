@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,9 +27,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.*
 import coil.compose.rememberImagePainter
 import com.example.compose_codelab.ui.theme.*
 import kotlinx.coroutines.launch
@@ -42,8 +47,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    LayoutsCodelab()
-
+                TwoTexts(modifier = Modifier,"오늘도", "빡코딩")
                 }
             }
         }
@@ -425,6 +429,207 @@ fun BodyContent(modifier: Modifier = Modifier, contentSlot : @Composable () -> U
 //    }
 }
 
+@Composable
+fun TwoTexts(modifier: Modifier = Modifier, text1: String, text2: String) {
+    Row(modifier = modifier
+        .background(Color.Yellow)
+        .height(IntrinsicSize.Min)) {
+        Text(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 4.dp)
+                .wrapContentWidth(Alignment.Start),
+            text = text1
+        )
+
+        Text(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 4.dp)
+                .height(100.dp)
+                .wrapContentWidth(Alignment.Start),
+            text = "asdfasdfasdfasdfasdf"
+        )
+
+        Divider(color = Color.Black, modifier = Modifier
+            .fillMaxHeight()
+            .width(1.dp))
+        Text(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 4.dp)
+                .wrapContentWidth(Alignment.End),
+
+            text = text2
+        )
+    }
+}
+
+@Composable
+fun DecoupledConstraintLayout() {
+
+    val buttonId : String = "MyButton"
+    val addingMarginBtnId : String = "AddingMarginBtnId"
+    val textId : String = "MyText"
+
+    // 추가된 마진
+    val addedMargin = remember{ mutableStateOf(0.dp) }
+
+    val animatedMargin = animateDpAsState(
+        targetValue = addedMargin.value,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioHighBouncy,
+            stiffness = Spring.StiffnessMedium
+        )
+    )
+    BoxWithConstraints {
+        val constraints = if (maxWidth < maxHeight) {
+            decoupledConstraints(
+                addingMarginBtnId,
+                buttonId,
+                textId,
+                margin = 16.dp,
+                addedMargin = animatedMargin.value) // Portrait constraints
+        } else {
+            decoupledConstraints(
+                addingMarginBtnId,
+                buttonId,
+                textId,
+                margin = 100.dp,
+                addedMargin = animatedMargin.value
+            ) // Landscape constraints
+        }
+        ConstraintLayout(constraints) {
+            Button(
+                onClick = { /* Do something */ },
+                modifier = Modifier.layoutId(buttonId)
+            ) {
+                Text("Button")
+            }
+            Button(
+                modifier = Modifier.layoutId(addingMarginBtnId),
+                onClick = {
+                    addedMargin.value = addedMargin.value + 100.dp
+                }) {
+                Text(text = "마진 추가 버튼")
+            }
+            Text("Text", Modifier.layoutId(textId))
+        }
+    }
+}
+
+
+private fun decoupledConstraints(addingMarginBtnId: String,
+                                 buttonId: String,
+                                 textId: String,
+                                 margin: Dp, addedMargin: Dp): ConstraintSet {
+    return ConstraintSet {
+        val button = createRefFor(buttonId)
+        val text = createRefFor(textId)
+        val addingMarginBtn = createRefFor(addingMarginBtnId)
+
+        constrain(button) {
+            top.linkTo(parent.top, margin= margin)
+        }
+        constrain(text) {
+            top.linkTo(button.bottom, margin)
+        }
+        constrain(addingMarginBtn){
+            top.linkTo(text.bottom, margin = addedMargin)
+        }
+    }
+}
+
+@Composable
+fun LargeConstraintLayout() {
+    ConstraintLayout(
+        modifier = Modifier.background(Color.Yellow)
+    ) {
+        val text = createRef()
+
+        val guideline = createGuidelineFromStart(fraction = 0.5f)
+        Text(
+            "This is a long long long long long long long text",
+            Modifier.constrainAs(text) {
+                linkTo(start = guideline, end = parent.end)
+                width = Dimension.preferredWrapContent.atLeast(100.dp)
+            }
+        )
+    }
+}
+
+@Composable
+fun ConstraintLayoutContent() {
+    ConstraintLayout {
+        // Creates references for the three composables
+        // in the ConstraintLayout's body
+        val (button1, button2, text) = createRefs()
+
+        Button(
+            onClick = { /* Do something */ },
+            modifier = Modifier.constrainAs(button1) {
+                top.linkTo(parent.top, margin = 16.dp)
+            }
+        ) {
+            Text("Button 1")
+        }
+
+        Text("안녕하세요!", Modifier.constrainAs(text) {
+            top.linkTo(button1.bottom, margin = 16.dp)
+            centerAround(button1.end)
+        })
+
+        val barrier = createEndBarrier(button1, text)
+        Button(
+            onClick = { /* Do something */ },
+            modifier = Modifier.constrainAs(button2) {
+                top.linkTo(parent.top, margin = 16.dp)
+                start.linkTo(barrier)
+            }
+        ) {
+            Text("Button 2")
+        }
+    }
+
+//    ConstraintLayout (
+//        modifier = Modifier.background(Color.Yellow).fillMaxSize()
+//    ){
+//
+//        // Create references for the composables to constrain
+//
+//        val (buttonRef, textRef, someTextRef) = createRefs()
+//
+//        Button(
+//            onClick = { /* Do something */ },
+//            // Assign reference "button" to the Button composable
+//            // and constrain it to the top of the ConstraintLayout
+//            modifier = Modifier.constrainAs(buttonRef) {
+////                top.linkTo(parent.top, margin = 100.dp)
+////                start.linkTo(parent.start)
+//                centerHorizontallyTo(parent)
+//            }
+//        ) {
+//            Text("Button")
+//        }
+//
+////        // Assign reference "text" to the Text composable
+////        // and constrain it to the bottom of the Button composable
+//        Text("Text", Modifier.constrainAs(textRef) {
+////            top.linkTo(buttonRef.bottom, margin = 16.dp)
+//            start.linkTo(buttonRef.end, margin = 30.dp)
+//        })
+//
+//        Text("SomeText", Modifier.constrainAs(someTextRef) {
+////            top.linkTo(button.bottom, margin = 16.dp)
+//            // Centers Text horizontally in the ConstraintLayout
+//            centerHorizontallyTo(buttonRef)
+////            top.linkTo(buttonRef.bottom, margin = 16.dp)
+//            centerVerticallyTo(parent)
+//        })
+//    }
+}
+
+
 @Preview(
     showBackground = true,
     widthDp = 320,
@@ -435,7 +640,7 @@ fun BodyContent(modifier: Modifier = Modifier, contentSlot : @Composable () -> U
 fun DefaultPreview() {
     Compose_CodelabTheme {
 //        MyColumn()
-        LayoutsCodelab()
+        TwoTexts(modifier = Modifier,"오늘도", "빡코딩")
         }
     }
 }
